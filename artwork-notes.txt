@@ -1,0 +1,7 @@
+Artwork made with the built-in image-generation tool.
+
+wax-seal.png prompt:
+Create a photorealistic luxury wedding invitation wax seal as a standalone transparent PNG asset. Reference style: polished antique gold thick double circular rim surrounding a dark chocolate-brown wax center, embossed elegant gold serif monogram exactly 'A & O' with A and O larger and ampersand between, tiny embossed gold botanical sprig beneath. Straight-on orthographic front view, perfectly centered circular seal, warm upper-left studio light, exquisite metallic highlights and authentic tactile wax imperfections. Seal fills 90% of square canvas with transparent padding. No envelope, no background, no other objects. This is a web animation layer.
+
+gold-paper.png prompt:
+Photorealistic macro material texture for a luxury wedding envelope: flat champagne gold pearlescent handmade paper, richly tactile very fine irregular paper grain, warm antique metallic gold sheen, subtle diffuse directional illumination upper left, uniform across whole rectangular landscape image, straight-on surface. No envelope folds, no seal, no text, no objects, no border, no gradients to black. Full bleed reusable texture asset.
