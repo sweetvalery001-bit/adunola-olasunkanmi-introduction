@@ -66,43 +66,42 @@
   }
 
 
-  // Staggered radial ribbons drift away from the seal without falling.
-  function burstPetals(count = 18) {
+  // One coordinated heart, followed by an outward scatter in every direction.
+  function burstPetals(count = 44) {
     if (reducedMotion.matches) return;
     const rect = envelope.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height * .48;
-    const waveRotation = Math.random() * Math.PI * 2;
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height * .48;
+    const centerX = innerWidth / 2;
+    const centerY = Math.max(135, Math.min(originY - 45, innerHeight * .43));
+    const unit = Math.min(innerWidth * .023, innerHeight * .015, 12);
     for (let i = 0; i < count; i++) {
       const p = document.createElement('img');
       p.src = 'gold-petal.png'; p.alt = ''; p.setAttribute('aria-hidden', 'true');
       p.className = 'burst-petal';
-      // Evenly cover all directions, with variation between each wave.
-      const angle = waveRotation + (i / count) * Math.PI * 2 + (Math.random() - .5) * .22;
-      const reachX = Math.min(innerWidth * .55, 490) * (.65 + Math.random() * .35);
-      const reachY = Math.min(innerHeight * .48, 390) * (.65 + Math.random() * .35);
-      const curl = (Math.random() - .5) * 80;
-      const rotation = Math.random() * 100 - 50;
-      const spin = (Math.random() - .5) * 220;
-      p.style.cssText = `left:${x}px;top:${y}px;width:${26 + Math.random() * 27}px;animation:none;will-change:transform,opacity`;
-      const frames = [];
-      for (let j = 0; j <= 60; j++) {
-        const t = j / 60;
-        const outward = 1 - Math.pow(1 - t, 2);
-        const bend = Math.sin(t * Math.PI) * curl;
-        const dx = Math.cos(angle) * reachX * outward - Math.sin(angle) * bend;
-        const dy = Math.sin(angle) * reachY * outward + Math.cos(angle) * bend;
-        const tilt = rotation + t * spin + Math.sin(t * Math.PI * 2) * 12;
-        const scale = .45 + .55 * Math.min(t / .16, 1);
-        frames.push({ offset:t, opacity:Math.min(t / .09, 1, (1 - t) / .36),
-          transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${tilt}deg) scale(${scale})` });
-      }
+      const angle = i / count * Math.PI * 2;
+      const hx = 16 * Math.pow(Math.sin(angle), 3) * unit;
+      const hy = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * unit;
+      const targetX = centerX + hx - originX;
+      const targetY = centerY + hy - originY;
+      // Use the heart's radial direction so its outline expands naturally.
+      const direction = Math.atan2(hy, hx);
+      const distance = Math.min(innerWidth, innerHeight) * (.55 + Math.random() * .35);
+      const endX = targetX + Math.cos(direction) * distance;
+      const endY = targetY + Math.sin(direction) * distance;
+      const rotation = Math.random() * 80 - 40;
+      const spin = (Math.random() - .5) * 180;
+      p.style.cssText = `left:${originX}px;top:${originY}px;width:${14 + Math.random() * 8}px;animation:none;will-change:transform,opacity`;
+      const pose = (x, y, r, scale = 1) => `translate(calc(-50% + ${x}px),calc(-50% + ${y}px)) rotate(${r}deg) scale(${scale})`;
       document.body.appendChild(p);
-      const flight = p.animate(frames, {
-        duration:7800 + Math.random() * 2200,
-        delay:Math.floor(i / 2) * 115 + Math.random() * 90,
-        easing:'linear', fill:'both'
-      });
+      const flight = p.animate([
+        {offset:0, opacity:0, transform:pose(0, 0, rotation, .3), easing:'cubic-bezier(.22,.61,.36,1)'},
+        {offset:.08, opacity:1, transform:pose(targetX * .22, targetY * .22, rotation, .7), easing:'cubic-bezier(.22,.61,.36,1)'},
+        {offset:.32, opacity:1, transform:pose(targetX, targetY, rotation)},
+        {offset:.46, opacity:1, transform:pose(targetX, targetY, rotation), easing:'cubic-bezier(.4,0,.2,1)'},
+        {offset:.83, opacity:.8, transform:pose(targetX + (endX-targetX)*.85, targetY + (endY-targetY)*.85, rotation+spin*.85), easing:'ease-out'},
+        {offset:1, opacity:0, transform:pose(endX, endY, rotation+spin, .8)}
+      ], {duration:7200, easing:'linear', fill:'both'});
       flight.onfinish = () => p.remove();
       flight.oncancel = () => p.remove();
     }
@@ -165,8 +164,8 @@
     envelope.classList.add("opening");
     if (!reducedMotion.matches) {
       setTimeout(() => { burstPetals(); releaseTalkingDrum(); }, 700);
-      setTimeout(() => burstPetals(12), 2100);
-      setTimeout(() => burstPetals(8), 3000);
+
+
     }
 
     function showInvitation() {
