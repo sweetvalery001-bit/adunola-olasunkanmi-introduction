@@ -72,16 +72,20 @@
     const rect = envelope.getBoundingClientRect();
     const originX = rect.left + rect.width / 2;
     const originY = rect.top + rect.height * .48;
-    const centerX = innerWidth / 2;
-    const centerY = Math.max(135, Math.min(originY - 45, innerHeight * .43));
-    const unit = Math.min(innerWidth * .023, innerHeight * .015, 12);
+    const card = envelope.querySelector('.letter-card').getBoundingClientRect();
+    // Match the final card-rise transform: translateY(-65%) scale(1.06).
+    const raisedTop = card.top - card.height * .68;
+    const centerX = card.left + card.width / 2;
+    const unitX = Math.min((card.width * 1.06 + 52) / 32, (innerWidth - 32) / 32);
+    const unitY = Math.min((card.height * 1.06 + 46) / 22, (innerHeight - 48) / 30);
+    const centerY = Math.max(12 * unitY + 18, raisedTop + 5 * unitY - 15);
     for (let i = 0; i < count; i++) {
       const p = document.createElement('img');
       p.src = 'gold-petal.png'; p.alt = ''; p.setAttribute('aria-hidden', 'true');
       p.className = 'burst-petal';
       const angle = i / count * Math.PI * 2;
-      const hx = 16 * Math.pow(Math.sin(angle), 3) * unit;
-      const hy = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * unit;
+      const hx = 16 * Math.pow(Math.sin(angle), 3) * unitX;
+      const hy = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * unitY;
       const targetX = centerX + hx - originX;
       const targetY = centerY + hy - originY;
       // Use the heart's radial direction so its outline expands naturally.
@@ -91,17 +95,17 @@
       const endY = targetY + Math.sin(direction) * distance;
       const rotation = Math.random() * 80 - 40;
       const spin = (Math.random() - .5) * 180;
-      p.style.cssText = `left:${originX}px;top:${originY}px;width:${14 + Math.random() * 8}px;animation:none;will-change:transform,opacity`;
+      p.style.cssText = `left:${originX}px;top:${originY}px;width:${19 + Math.random() * 7}px;animation:none;will-change:transform,opacity`;
       const pose = (x, y, r, scale = 1) => `translate(calc(-50% + ${x}px),calc(-50% + ${y}px)) rotate(${r}deg) scale(${scale})`;
       document.body.appendChild(p);
       const flight = p.animate([
         {offset:0, opacity:0, transform:pose(0, 0, rotation, .3), easing:'cubic-bezier(.22,.61,.36,1)'},
         {offset:.08, opacity:1, transform:pose(targetX * .22, targetY * .22, rotation, .7), easing:'cubic-bezier(.22,.61,.36,1)'},
-        {offset:.32, opacity:1, transform:pose(targetX, targetY, rotation)},
-        {offset:.46, opacity:1, transform:pose(targetX, targetY, rotation), easing:'cubic-bezier(.4,0,.2,1)'},
+        {offset:.30, opacity:1, transform:pose(targetX, targetY, rotation)},
+        {offset:.39, opacity:1, transform:pose(targetX, targetY, rotation), easing:'cubic-bezier(.4,0,.2,1)'},
         {offset:.83, opacity:.8, transform:pose(targetX + (endX-targetX)*.85, targetY + (endY-targetY)*.85, rotation+spin*.85), easing:'ease-out'},
         {offset:1, opacity:0, transform:pose(endX, endY, rotation+spin, .8)}
-      ], {duration:7200, easing:'linear', fill:'both'});
+      ], {duration:8800, easing:'linear', fill:'both'});
       flight.onfinish = () => p.remove();
       flight.oncancel = () => p.remove();
     }
