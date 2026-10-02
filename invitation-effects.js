@@ -66,26 +66,47 @@
   }
 
 
-  function burstPetals(count = 24) {
+  // Staggered radial ribbons drift away from the seal without falling.
+  function burstPetals(count = 18) {
     if (reducedMotion.matches) return;
     const rect = envelope.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height * .48;
-    for (let i=0; i<count; i++) {
-      const p=document.createElement('img');
-      p.src='gold-petal.png'; p.alt=''; p.setAttribute('aria-hidden','true');
-      p.className='burst-petal';
-      const angle=(i/count)*Math.PI*2;
-      const radius=Math.min(innerWidth*.46,390)*(0.5+(i%7)/12);
-      const dx=Math.cos(angle)*radius;
-      const dy=Math.sin(angle)*radius*.7-90;
-      const values={'--origin-x':x+'px','--origin-y':y+'px','--size':(34+i%6*8)+'px','--burst-x':dx+'px','--burst-y':dy+'px','--end-x':dx*1.3+'px','--end-y':(innerHeight-y+100)+'px','--spin':(i*49)+'deg','--flight':(8.5+i%5*.4)+'s','--lag':(i*.075)+'s'};
-      Object.entries(values).forEach(([k,v])=>p.style.setProperty(k,v));
-      document.body.appendChild(p);p.addEventListener('animationend',()=>p.remove(),{once:true});
+    const waveRotation = Math.random() * Math.PI * 2;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('img');
+      p.src = 'gold-petal.png'; p.alt = ''; p.setAttribute('aria-hidden', 'true');
+      p.className = 'burst-petal';
+      // Evenly cover all directions, with variation between each wave.
+      const angle = waveRotation + (i / count) * Math.PI * 2 + (Math.random() - .5) * .22;
+      const reachX = Math.min(innerWidth * .55, 490) * (.65 + Math.random() * .35);
+      const reachY = Math.min(innerHeight * .48, 390) * (.65 + Math.random() * .35);
+      const curl = (Math.random() - .5) * 80;
+      const rotation = Math.random() * 100 - 50;
+      const spin = (Math.random() - .5) * 220;
+      p.style.cssText = `left:${x}px;top:${y}px;width:${26 + Math.random() * 27}px;animation:none;will-change:transform,opacity`;
+      const frames = [];
+      for (let j = 0; j <= 60; j++) {
+        const t = j / 60;
+        const outward = 1 - Math.pow(1 - t, 2);
+        const bend = Math.sin(t * Math.PI) * curl;
+        const dx = Math.cos(angle) * reachX * outward - Math.sin(angle) * bend;
+        const dy = Math.sin(angle) * reachY * outward + Math.cos(angle) * bend;
+        const tilt = rotation + t * spin + Math.sin(t * Math.PI * 2) * 12;
+        const scale = .45 + .55 * Math.min(t / .16, 1);
+        frames.push({ offset:t, opacity:Math.min(t / .09, 1, (1 - t) / .36),
+          transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${tilt}deg) scale(${scale})` });
+      }
+      document.body.appendChild(p);
+      const flight = p.animate(frames, {
+        duration:7800 + Math.random() * 2200,
+        delay:Math.floor(i / 2) * 115 + Math.random() * 90,
+        easing:'linear', fill:'both'
+      });
+      flight.onfinish = () => p.remove();
+      flight.oncancel = () => p.remove();
     }
   }
-
-
 
   let musicHits=[];
   // Decode a separate copy for onset analysis; original music playback stays untouched.
@@ -144,8 +165,8 @@
     envelope.classList.add("opening");
     if (!reducedMotion.matches) {
       setTimeout(() => { burstPetals(); releaseTalkingDrum(); }, 700);
-      setTimeout(() => burstPetals(18), 2100);
-      setTimeout(() => burstPetals(12), 3000);
+      setTimeout(() => burstPetals(12), 2100);
+      setTimeout(() => burstPetals(8), 3000);
     }
 
     function showInvitation() {
