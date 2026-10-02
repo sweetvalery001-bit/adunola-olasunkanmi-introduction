@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//AO Introduction//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:adunola-olasunkanmi-20261212@example.invalid
+DTSTAMP:20261002T000000Z
+DTSTART:20261212T110000Z
+DTEND:20261212T130000Z
+SUMMARY:Adunola & Olasunkanmi's Introduction Ceremony
+DESCRIPTION:Join us as two families unite in love.\nPlease contact us for
+  venue directions.
+LOCATION:Ikeja\, Lagos
+END:VEVENT
+END:VCALENDAR

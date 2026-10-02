@@ -927,68 +927,23 @@ function askDirections() {
 /* ADD TO CALENDAR */
 
 function addCalendar() {
-
-  const event = [
-
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//AO Introduction//EN",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-
-    "BEGIN:VEVENT",
-
-    "UID:adunola-olasunkanmi-20261212@example.invalid",
-
-    "DTSTAMP:" +
-      new Date().toISOString()
-      .replace(/[-:]/g, "")
-      .replace(/\.\d{3}/, ""),
-
-    // 12 Noon Nigeria time = 11 AM UTC
-
-    "DTSTART:20261212T110000Z",
-
-    // Provisional event end time: 2 PM Nigeria time
-
-    "DTEND:20261212T130000Z",
-
-    "SUMMARY:Adunola and Olasunkanmi Introduction Ceremony",
-
-    "DESCRIPTION:Join us as two families unite in love. Please contact us for venue directions.",
-
-    "LOCATION:Ikeja\\, Lagos",
-
-    "END:VEVENT",
-    "END:VCALENDAR"
-
-  ].join("\r\n") + "\r\n";
-
-  const blob = new Blob(
-    [event],
-    {type: "text/calendar;charset=utf-8"}
-  );
-
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-
-  link.href = url;
-
-  link.download =
-    "Adunola-Olasunkanmi-Introduction.ics";
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  link.remove();
-
-  setTimeout(
-    () => URL.revokeObjectURL(url),
-    1000
-  );
-
+  const appleDevice = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  if (appleDevice) {
+    // A real calendar URL lets the browser hand the event to a calendar app.
+    // Do not force a download or create a temporary blob URL.
+    window.location.assign(new URL('introduction.ics', document.baseURI).href);
+    return;
+  }
+  const eventUrl = new URL('https://calendar.google.com/calendar/render');
+  eventUrl.search = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: "Adunola & Olasunkanmi's Introduction Ceremony",
+    dates: '20261212T110000Z/20261212T130000Z',
+    ctz: 'Africa/Lagos',
+    location: 'Ikeja, Lagos',
+    details: 'Join us as two families unite in love. Please contact us for venue directions. https://sweetvalery001-bit.github.io/adunola-olasunkanmi-introduction/'
+  }).toString();
+  window.location.assign(eventUrl.href);
 }
 
 </script>
